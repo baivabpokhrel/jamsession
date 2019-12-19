@@ -1,17 +1,18 @@
-import React,{Component} from "react";
+import React, {Component} from "react";
 import "./Profile.css";
-import /*Amplify, {Auth,*/{API, graphqlOperation} from 'aws-amplify';
-import { Row, Col, /*Image, ListGroup, ListGroupItem,*/ Table,Button,Modal,InputGroup,FormControl} from 'react-bootstrap';
+import {API, graphqlOperation} from 'aws-amplify';
+import { Row, Col,Table,Button,Modal,InputGroup,FormControl} from 'react-bootstrap';
 import {listSongs} from "../graphql/Queries";
 import {createSongs} from "../graphql/Mutations";
 
-
 class JammerHistory extends Component {
-    state = { 
+    state = {
             title: '',
             type:'public',
-            collaborators:'', 
-            songs: []
+            collaborators:'',
+            songs: [],
+            isActive: null,
+            isOpen: false
     }
     async componentDidMount() {
         try {
@@ -40,17 +41,27 @@ class JammerHistory extends Component {
         }
     }
     handleClose = () => this.setState({ show: false });
-    handleShow = () => this.setState({ show: true });
-     
-
+    handleShow = () => this.setState({ show: true});
+    toggleClose = () => {this.setState({isOpen: false})};
+    toggleActive = i => {
+        if (i === this.state.isActive) {
+            this.setState({
+                isActive: null
+            });
+        } else {
+            this.setState({
+                isActive: i
+            });
+        }
+    };
     render() {
-        
+
         return (
-            
+
             <div className="JammerHistory">
-               
+
                     <div>
-                    <Row>    
+                    <Row>
                     <Col s={6} md={4}>
                         <Button variant="primary" onClick={this.handleShow} bsSize="large" block bsStyle="danger">
                             Create Song
@@ -61,7 +72,6 @@ class JammerHistory extends Component {
                                 <Modal.Title>Let's Create a new Song</Modal.Title>
                             </Modal.Header>
                             <form className="container">
-
                                 <h3>Song Name</h3>
                                 <InputGroup >
                                     <FormControl
@@ -71,7 +81,6 @@ class JammerHistory extends Component {
                                         onChange={this.onChange}
                                         value={this.state.title}
                                     />
-
                                 </InputGroup >
                                 <InputGroup >
                                     <h3>Private/ Public</h3>
@@ -81,9 +90,7 @@ class JammerHistory extends Component {
                                         placeholder="Enter Private or Public"
                                         value={this.state.type}
                                         onChange={this.onChange}
-
                                     />
-
                                 </InputGroup >
                                 <InputGroup >
                                     <h3>Add Collaborators</h3>
@@ -94,9 +101,7 @@ class JammerHistory extends Component {
                                         value={this.state.collaborators}
                                         onChange={this.onChange}
                                     />
-
                                 </InputGroup >
-
                             </form>
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={this.handleClose}>
@@ -107,45 +112,34 @@ class JammerHistory extends Component {
                                 </Button>
                             </Modal.Footer>
                         </Modal>
-                    </Col>  
+                    </Col>
                     </Row>
                     </div>
-
-                
                 <div>
                 <h2>Jammer History</h2>
                 <Table striped bordered responsive  >
                     <thead>
                         <tr>
-
                             <td>Song Name</td>
                             <td>Privacy</td>
                             <td>Jammers</td>
-
-
                         </tr>
                     </thead>
-                   
                     {
                         this.state.songs.map((rest, i) => (
-                            <tbody key={i}>
-                                <tr>
-
+                            <tbody>
+                                <tr key={rest.songid} style={this.state.isActive === i ? { background: '#DAF8FC' } : { background: 'white' }}
+                                    onMouseOver={()=>{this.toggleActive(i);}}>
                                     <td><a href={`/coder/${rest.songid}`}>{rest.title}</a></td>
-
-                                    
-
                                     <td>Privacy</td>
                                     <td>Jammers</td>
                                 </tr>
                             </tbody>
-                        ))
+                    ))
                     }
-
                 </Table>
             </div>
-            </div>)        
-        
+            </div>)
     }
 }
 export default JammerHistory;
